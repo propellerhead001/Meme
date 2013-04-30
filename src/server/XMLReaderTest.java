@@ -34,6 +34,11 @@ public class XMLReaderTest {
 	assertEquals("20120102b7", videoFile.getID());
 	assertEquals("Avengers", videoFile.getTitle());
 	assertEquals("avengers-featurehp.mp4", videoFile.getFilename());
+	// Check third video is returned
+	videoFile = videoList.get(2);
+	assertEquals("20120102b7", videoFile.getID());
+	assertEquals("Prometheus", videoFile.getTitle());
+	assertEquals("prometheus-featureukFhp.mp4", videoFile.getFilename());
 	}
 	
 	@Test
@@ -49,5 +54,9 @@ public class XMLReaderTest {
 		assertEquals("20120102b7", videoFile.getID());
 		assertEquals("Avengers", videoFile.getTitle());
 		assertEquals("avengers-featurehp.mp4", videoFile.getFilename());
+		videoFile = serverList.get(2);
+		assertEquals("20120102b7", videoFile.getID());
+		assertEquals("Prometheus", videoFile.getTitle());
+		assertEquals("prometheus-featureukFhp.mp4", videoFile.getFilename());
 	}
 }
