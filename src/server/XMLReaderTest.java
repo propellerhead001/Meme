@@ -28,12 +28,12 @@ public class XMLReaderTest {
 	public void videoFileReturnsCorrectFields() {
 	VideoFile videoFile = videoList.get(0);
 	assertEquals("20120213a2", videoFile.getID());
-	assertNotNull("Monsters Inc.", videoFile.getTitle());
-	assertNotNull("monstersinc_high.mpg", videoFile.getFilename());
+	assertEquals("Monsters Inc.", videoFile.getTitle());
+	assertEquals("monstersinc_high.mpg", videoFile.getFilename());
 	videoFile = videoList.get(1);
 	assertEquals("20120102b7", videoFile.getID());
-	assertNotNull("Avengers", videoFile.getTitle());
-	assertNotNull("avengers-featurehp.mp4", videoFile.getFilename());
+	assertEquals("Avengers", videoFile.getTitle());
+	assertEquals("avengers-featurehp.mp4", videoFile.getFilename());
 	}
 	
 	@Test
@@ -43,11 +43,11 @@ public class XMLReaderTest {
 		assertTrue(serverList instanceof List);
 		VideoFile videoFile = serverList.get(0);
 		assertEquals("20120213a2", videoFile.getID());
-		assertNotNull("Monsters Inc.", videoFile.getTitle());
-		assertNotNull("monstersinc_high.mpg", videoFile.getFilename());
+		assertEquals("Monsters Inc.", videoFile.getTitle());
+		assertEquals("monstersinc_high.mpg", videoFile.getFilename());
 		videoFile = serverList.get(1);
 		assertEquals("20120102b7", videoFile.getID());
-		assertNotNull("Avengers", videoFile.getTitle());
-		assertNotNull("avengers-featurehp.mp4", videoFile.getFilename());
+		assertEquals("Avengers", videoFile.getTitle());
+		assertEquals("avengers-featurehp.mp4", videoFile.getFilename());
 	}
 }
