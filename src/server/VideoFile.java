@@ -1,31 +1,19 @@
 package server;
 public class VideoFile {
+
 	private String id, title, filename;
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
 
-	public VideoFile(){
-	}
+	// Constuctor
+	public VideoFile(){}
 
-	public Object getID() {
-		return id;
-	}
+	// Setters
+	public void setId(String id) { this.id = id; } 	
+	public void setTitle(String title) { this.title = title; }	
+	public void setFilename(String filename) { this.filename = filename; }
 
-	public Object getTitle() {
-		return title;
-	}
-
-	public Object getFilename() {
-		return filename;
-	}
+	// Getters
+	public String getID() { return id; }
+	public String getTitle() { return title; }
+	public String getFilename() { return filename; }
 
 }
