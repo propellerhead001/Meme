@@ -22,50 +22,53 @@ public class XMLReader extends DefaultHandler{
 	public XMLReader(String filename){
 		inputFile = filename;
 
-		try {
-			// use the default parser
+		try 
+		{
+			// Instantiate the default parser
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			// parse the input
+			// Parse the input file
 			saxParser.parse(inputFile, this);
 		}
-		catch (ParserConfigurationException pce) {
+		catch (ParserConfigurationException pce) 
+		{
 			pce.printStackTrace();
 		}
-		catch (SAXException saxe) {
+		catch (SAXException saxe) 
+		{
 			saxe.printStackTrace();
 		}
-		catch (IOException ioe) {
+		catch (IOException ioe)
+		{
 			ioe.printStackTrace();
 		}
 
 	}
 
-	public List<VideoFile> getList(){
-		return videoList;
-
-	}
+	public List<VideoFile> getList() { return videoList; }
 
 	// overridden method for start element callback
-	public void startElement(String uri, String localName, String qName, Attributes
-			attrs) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 		// sort out element name if (no) namespace in use
 		String elementName = localName;
-		if ("".equals(elementName)) {
+		if ("".equals(elementName)) 
+		{
 			elementName = qName;
 		}
-		if(elementName.equals("videolist")){
-		}
-		else if(elementName.equals("video")) {
+		if(elementName.equals("videolist")){ }
+		else if(elementName.equals("video")) 
+		{
 			if(currentVideo == null){
 				currentVideo = new VideoFile();
 			}
 			currentVideo.setId(attrs.getValue(0));
 		}
-		else if(elementName.equals("title")){
+		else if(elementName.equals("title"))
+		{
 			currentElement = ProcessingElement.TITLE;
 		}
-		else if(elementName.equals("filename")){
+		else if(elementName.equals("filename"))
+		{
 			currentElement = ProcessingElement.FILENAME;
 		}
 	}
