@@ -13,8 +13,8 @@ public class XMLReaderTest {
 	private List<VideoFile> videoList, serverList;
 	@Before
 	public void setUp() throws Exception {
-	reader = new XMLReader("videoList.xml");
-	videoList = reader.getList();
+	reader = new XMLReader();
+	videoList = reader.getList("videoList.xml");
 	}
 	@Test
 	public void createListOfVideos() {

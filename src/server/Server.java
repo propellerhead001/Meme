@@ -7,8 +7,8 @@ public class Server {
 	private XMLReader reader;
 	
 	public Server(){
-		reader = new XMLReader("videolist.xml");
-		videoList = reader.getList();
+		reader = new XMLReader();
+		videoList = reader.getList("videolist.xml");
 	}
 	
 	public List<VideoFile> getList() {

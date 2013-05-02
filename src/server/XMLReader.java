@@ -19,7 +19,10 @@ public class XMLReader extends DefaultHandler{
 	private String inputFile;
 	private ProcessingElement currentElement = ProcessingElement.NONE;
 
-	public XMLReader(String filename){
+	public XMLReader(){
+	}
+
+	public List<VideoFile> getList(String filename){
 		inputFile = filename;
 
 		try {
@@ -38,10 +41,6 @@ public class XMLReader extends DefaultHandler{
 		catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-
-	}
-
-	public List<VideoFile> getList(){
 		return videoList;
 
 	}
