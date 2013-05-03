@@ -15,4 +15,9 @@ public class Server {
 		return videoList;
 	}
 
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
