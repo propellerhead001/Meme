@@ -9,7 +9,6 @@ import org.junit.Test;
 
 public class XMLReaderTest {
 	private XMLReader reader;
-	private Server	server;
 	private List<VideoFile> videoList;
 	@Before
 	public void setUp() throws Exception {
