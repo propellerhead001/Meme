@@ -10,7 +10,7 @@ import org.junit.Test;
 public class XMLReaderTest {
 	private XMLReader reader;
 	private Server	server;
-	private List<VideoFile> videoList, serverList;
+	private List<VideoFile> videoList;
 	@Before
 	public void setUp() throws Exception {
 	reader = new XMLReader();
@@ -34,20 +34,5 @@ public class XMLReaderTest {
 	assertEquals("20120102b7", videoFile.getID());
 	assertNotNull("Avengers", videoFile.getTitle());
 	assertNotNull("avengers-featurehp.mp4", videoFile.getFilename());
-	}
-	
-	@Test
-	public void serverGetsList(){
-		server = new Server();
-		serverList = server.getList();
-		assertTrue(serverList instanceof List);
-		VideoFile videoFile = serverList.get(0);
-		assertEquals("20120213a2", videoFile.getID());
-		assertNotNull("Monsters Inc.", videoFile.getTitle());
-		assertNotNull("monstersinc_high.mpg", videoFile.getFilename());
-		videoFile = serverList.get(1);
-		assertEquals("20120102b7", videoFile.getID());
-		assertNotNull("Avengers", videoFile.getTitle());
-		assertNotNull("avengers-featurehp.mp4", videoFile.getFilename());
 	}
 }
