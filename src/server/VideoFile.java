@@ -1,5 +1,8 @@
 package server;
-public class VideoFile {
+
+import java.io.Serializable;
+
+public class VideoFile implements Serializable{
 	private String id, title, filename;
 	public void setId(String id) {
 		this.id = id;
