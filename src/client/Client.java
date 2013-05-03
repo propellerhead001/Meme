@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import javax.swing.JComboBox;
+
 import server.VideoFile;
 
 public class Client {
@@ -14,6 +16,7 @@ public class Client {
 	private String host = "127.0.0.1";
 	private ObjectInputStream inputFromServer;
 	private List<VideoFile> videoList;
+	public JComboBox selectionBox;
 	public VideoFile getList(int i) {
 		try {
 			openSocket();
