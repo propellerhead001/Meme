@@ -26,16 +26,19 @@ public class Client {
 			System.out.println("Couldn't open I/O connection : " + host + ":" + port);
 			System.exit(-1);
 		} catch (ClassNotFoundException e) {
-			System.out.println(“Class definition not found for incoming object.");
+			System.out.println("Class definition not found for incoming object.");
 					e.printStackTrace();
 					System.exit(-1);
 		}
+		return videoList.get(i);
 	}
 	private void openSocket() throws UnknownHostException, IOException {
 		serverSocket = new Socket(host, port);
+		System.out.println("Connected to: " + host + " on port: "+port);
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
 	}
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
+		System.out.println("List retrieved");
 	}
 }

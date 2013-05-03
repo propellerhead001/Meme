@@ -19,7 +19,7 @@ public class ClientTest {
 	public void videoFileReturnsCorrectValue() {
 		VideoFile videoFile = client.getList(0);
 		assertEquals("20120213a2", videoFile.getID());
-		assertEquals("First Video Title", videoFile.getTitle());
-		assertEquals("firstVideoFile.mpg", videoFile.getFilename());
+		assertNotNull("Monsters Inc.", videoFile.getTitle());
+		assertNotNull("monstersinc_high.mpg", videoFile.getFilename());
 	}
 }
