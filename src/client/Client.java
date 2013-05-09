@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -7,16 +8,33 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import server.VideoFile;
 
 public class Client {
 	private Socket serverSocket;
-	private int port = 1138;
+	private int port = 135;
 	private String host = "127.0.0.1";
 	private ObjectInputStream inputFromServer;
 	private List<VideoFile> videoList;
-	public JComboBox selectionBox;
+	
+	public void setupGUI()
+	{
+		JFrame frame = new JFrame();
+		JPanel panel = new JPanel(new BorderLayout());
+		JComboBox selectionBox = new JComboBox();
+		
+		frame.add(panel);
+		frame.setVisible(true);
+		frame.setSize(600,400);
+		frame.setTitle("A Client");
+		
+		panel.add(selectionBox, BorderLayout.NORTH);		
+	}
+	
+	
 	public VideoFile getList(int i) {
 		try {
 			openSocket();
