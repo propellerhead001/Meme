@@ -21,7 +21,7 @@ public class Client implements ActionListener {
 	private String host = "127.0.0.1";
 	private ObjectInputStream inputFromServer;
 	private List<VideoFile> videoList;
-	private JComboBox<String> selectionBox;
+	public JComboBox<String> selectionBox;
 
 	public void setupGUI()
 	{
