@@ -12,7 +12,7 @@ public class Server {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	ObjectOutputStream outputToClient;
-	private int port = 135;
+	private int port = 1135;
 
 	public Server(){
 		reader = new XMLReader();

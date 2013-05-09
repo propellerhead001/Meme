@@ -26,6 +26,6 @@ public class ClientTest {
 	@Test
 	public void checkSelectedVideoInList() {
 		client.setupGUI();
-		
+		while(1 == 1){}
 	}
 }
