@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 
 public class Client implements ActionListener {
 	private Socket serverSocket;
@@ -52,6 +54,7 @@ public class Client implements ActionListener {
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+		
 		setupGUI();
 	}
 	public static void main(String[] args) {
@@ -78,7 +81,6 @@ public class Client implements ActionListener {
 
 		panel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
-		//while(videoFile == null){}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -107,14 +109,18 @@ public class Client implements ActionListener {
 	}
 	private void playVideo(String media){
 		mainFrame = new JFrame();
+		JPanel panel = new JPanel(new BorderLayout());
 		
+		mainFrame.add(panel);
 		mainFrame.setVisible(true);
 		mainFrame.setSize(600,400);
 		mainFrame.setTitle("Player");
 		
 		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-		mainFrame.setContentPane(mediaPlayerComponent);
+		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		EmbeddedMediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();
+		PlayerControlsPanel controlsPanel = new PlayerControlsPanel(mediaPlayer);
+		panel.add(controlsPanel, BorderLayout.SOUTH);
 		mediaPlayer.playMedia(media);
 	}
 }
