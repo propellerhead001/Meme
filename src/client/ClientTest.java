@@ -25,7 +25,6 @@ public class ClientTest {
 	}
 	@Test
 	public void checkSelectedVideoInList() {
-		client.setupGUI();
 		JComboBox<String> comboBox = client.selectionBox;
 		comboBox.setSelectedIndex(2);
 		assertEquals("Prometheus", comboBox.getSelectedItem());

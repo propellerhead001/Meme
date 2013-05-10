@@ -13,7 +13,13 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
+
 import server.VideoFile;
+import uk.co.caprica.vlcj.binding.LibVlc;
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 public class Client implements ActionListener {
 	private Socket serverSocket;
@@ -24,43 +30,6 @@ public class Client implements ActionListener {
 	public JComboBox<String> selectionBox;
 	
 	public Client(){
-		
-	}
-
-	public void setupGUI()
-	{
-		if(videoList==null){
-			getList(1);
-		}
-		String [] selectionListData = new String[videoList.size()];
-		for(int i = 0; i < videoList.size(); i++)
-		{
-			selectionListData[i] = videoList.get(i).getTitle().toString();
-		}
-		JFrame frame = new JFrame();
-		JPanel panel = new JPanel(new BorderLayout());
-
-		selectionBox = new JComboBox<String>(selectionListData);
-		selectionBox.setSelectedIndex(0);
-
-
-		frame.add(panel);
-		frame.setVisible(true);
-		frame.setSize(600,400);
-		frame.setTitle("A Client");
-
-		panel.add(selectionBox, BorderLayout.NORTH);		
-		selectionBox.addActionListener((ActionListener) this);
-	}
-	
-	public void actionPerformed(ActionEvent e) {
-		JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
-		String selectedTitle = (String)comboBox.getSelectedItem();
-		System.out.println("Selected title : " + selectedTitle);
-	}
-
-
-	public VideoFile getList(int i) {
 		try {
 			openSocket();
 			getListFromSocket();
@@ -76,6 +45,45 @@ public class Client implements ActionListener {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
+		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+		setupGUI();
+	}
+
+	public void setupGUI()
+	{
+		String [] selectionListData = new String[videoList.size()];
+		for(int i = 0; i < videoList.size(); i++)
+		{
+			selectionListData[i] = videoList.get(i).getTitle().toString();
+		}
+		JFrame frame = new JFrame();
+		JPanel panel = new JPanel(new BorderLayout());
+
+		selectionBox = new JComboBox<String>(selectionListData);
+		selectionBox.setSelectedIndex(0);
+
+		frame.add(panel);
+		frame.setVisible(true);
+		frame.setSize(600,400);
+		frame.setTitle("A Client");
+
+		panel.add(selectionBox, BorderLayout.NORTH);		
+		selectionBox.addActionListener((ActionListener) this);
+		
+		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+		frame.setContentPane(mediaPlayerComponent);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
+		String selectedTitle = (String)comboBox.getSelectedItem();
+		System.out.println("Selected title : " + selectedTitle);
+	}
+
+
+	public VideoFile getList(int i) {
 		return videoList.get(i);
 	}
 	private void openSocket() throws UnknownHostException, IOException {
