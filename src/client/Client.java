@@ -22,6 +22,10 @@ public class Client implements ActionListener {
 	private ObjectInputStream inputFromServer;
 	private List<VideoFile> videoList;
 	public JComboBox<String> selectionBox;
+	
+	public Client(){
+		
+	}
 
 	public void setupGUI()
 	{
