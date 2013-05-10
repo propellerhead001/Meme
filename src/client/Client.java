@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -27,9 +28,10 @@ import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 
 public class Client implements ActionListener {
 	private Socket serverSocket;
-	private int port = 1135;
+	private int port = 1140;
 	private String host = "127.0.0.1";
 	private ObjectInputStream inputFromServer;
+	private ObjectOutputStream outputToServer;
 	private List<VideoFile> videoList;
 	public JComboBox<String> selectionBox;
 	private VideoFile videoFile;
@@ -39,7 +41,6 @@ public class Client implements ActionListener {
 		try {
 			openSocket();
 			getListFromSocket();
-			serverSocket.close();
 		} catch (UnknownHostException e) {
 			System.out.println("Don't know about host : " + host);
 			System.exit(-1);
@@ -90,6 +91,14 @@ public class Client implements ActionListener {
 		if(mainFrame != null){
 			mainFrame.dispose();
 		}
+		
+		try {
+			outputToServer.writeObject(videoFile);
+			serverSocket.close();
+		} catch (IOException e1) {
+			System.out.println("Failed to send selection / close socket");
+			e1.printStackTrace();
+		}
 		playVideo("rtp://@127.0.0.1:5555");
 	}
 
@@ -101,6 +110,7 @@ public class Client implements ActionListener {
 		serverSocket = new Socket(host, port);
 		System.out.println("Connected to: " + host + " on port: "+port);
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
+		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();

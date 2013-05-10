@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,7 +21,9 @@ public class Server {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	ObjectOutputStream outputToClient;
-	private int port = 1135;
+	private int port = 1140;
+	private ObjectInputStream videoToStream;
+	private VideoFile fileToStream;
 
 	public Server(){
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
@@ -29,7 +32,8 @@ public class Server {
 		reader = new XMLReader();
 		videoList = reader.getList("videolist.xml");
 		socketThread.start();
-		streamVideo(videoList.get(1).getFilename().toString());
+		while(socketThread.isAlive()){}
+		streamVideo(fileToStream.getFilename().toString());
 	}
 
 	public List<VideoFile> getList() {
@@ -44,9 +48,10 @@ public class Server {
 			try {
 				openSocket();
 				writeListToSocket();
+				getFilenameFromSocket();
 				clientSocket.close();
 				serverSocket.close();
-			} catch (IOException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("ERROR on socket connection.");
 				e.printStackTrace();
 			}
@@ -69,9 +74,13 @@ public class Server {
 			System.exit(-1);
 		}
 		outputToClient = new ObjectOutputStream(clientSocket.getOutputStream());
+		videoToStream = new ObjectInputStream(clientSocket.getInputStream());
 	}
 	private void writeListToSocket() throws IOException {
 		outputToClient.writeObject(videoList);
+	}
+	private void getFilenameFromSocket() throws ClassNotFoundException, IOException{
+		fileToStream = (VideoFile) videoToStream.readObject();
 	}
 	private void streamVideo(String media){
 		MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(media);
