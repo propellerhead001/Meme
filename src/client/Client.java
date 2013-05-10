@@ -16,9 +16,11 @@ import javax.swing.JPanel;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
+import server.Server;
 import server.VideoFile;
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 public class Client implements ActionListener {
@@ -28,6 +30,8 @@ public class Client implements ActionListener {
 	private ObjectInputStream inputFromServer;
 	private List<VideoFile> videoList;
 	public JComboBox<String> selectionBox;
+	private VideoFile videoFile;
+	private static JFrame mainFrame;
 	
 	public Client(){
 		try {
@@ -50,6 +54,9 @@ public class Client implements ActionListener {
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		setupGUI();
 	}
+	public static void main(String[] args) {
+		new Client();
+	}
 
 	public void setupGUI()
 	{
@@ -71,15 +78,18 @@ public class Client implements ActionListener {
 
 		panel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
-		
-		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-		frame.setContentPane(mediaPlayerComponent);
+		//while(videoFile == null){}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
 		String selectedTitle = (String)comboBox.getSelectedItem();
 		System.out.println("Selected title : " + selectedTitle);
+		videoFile = videoList.get(comboBox.getSelectedIndex());
+		if(mainFrame != null){
+			mainFrame.dispose();
+		}
+		playVideo(videoFile.getFilename().toString());
 	}
 
 
@@ -94,5 +104,17 @@ public class Client implements ActionListener {
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
 		System.out.println("List retrieved");
+	}
+	private void playVideo(String media){
+		mainFrame = new JFrame();
+		
+		mainFrame.setVisible(true);
+		mainFrame.setSize(600,400);
+		mainFrame.setTitle("Player");
+		
+		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+		mainFrame.setContentPane(mediaPlayerComponent);
+		EmbeddedMediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();
+		mediaPlayer.playMedia(media);
 	}
 }
