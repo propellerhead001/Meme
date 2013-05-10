@@ -54,7 +54,6 @@ public class Client implements ActionListener {
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
-		
 		setupGUI();
 	}
 	public static void main(String[] args) {
@@ -91,7 +90,7 @@ public class Client implements ActionListener {
 		if(mainFrame != null){
 			mainFrame.dispose();
 		}
-		playVideo(videoFile.getFilename().toString());
+		playVideo("rtp://@127.0.0.1:5555");
 	}
 
 
