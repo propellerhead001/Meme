@@ -19,6 +19,7 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 import server.Server;
+import server.ClientPort;
 import server.VideoFile;
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
@@ -38,6 +39,7 @@ public class Client implements ActionListener {
 	private static JFrame mainFrame;
 	private JFrame frame;
 	private JPanel panel;
+	private ClientPort serverComm;
 	
 	public Client(){
 		connectToServer();
@@ -50,6 +52,9 @@ public class Client implements ActionListener {
 		try {
 			openSocket();
 			getListFromSocket();
+			getPortsFromSocket();
+			serverSocket.close();
+			openCommSocket(serverComm.getCommPort());
 		} catch (UnknownHostException e) {
 			System.out.println("Don't know about host : " + host);
 			System.exit(-1);
@@ -61,6 +66,24 @@ public class Client implements ActionListener {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+	}
+	private void openCommSocket(int commPort) throws IOException {
+		
+		serverSocket = new Socket(host, commPort);
+		System.out.println("Connected to: " + host + " on port: "+port);
+		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
+	}
+	private void getPortsFromSocket() {
+		try {
+			serverComm = (ClientPort) inputFromServer.readObject();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Ports retrieved");
 	}
 	public static void main(String[] args) {
 		new Client();
@@ -107,7 +130,8 @@ public class Client implements ActionListener {
 			System.out.println("Failed to send selection / close socket");
 			e1.printStackTrace();
 		}
-		playVideo("rtp://@127.0.0.1:5555");
+		
+		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
 	}
 
 
@@ -118,21 +142,12 @@ public class Client implements ActionListener {
 		serverSocket = new Socket(host, port);
 		System.out.println("Connected to: " + host + " on port: "+port);
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
-		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
 		System.out.println("List retrieved");
 	}
 	private void playVideo(String media){
-		/*mainFrame = new JFrame();
-		JPanel panel = new JPanel(new BorderLayout());*/
-		
-		/*mainFrame.add(panel);
-		mainFrame.setVisible(true);
-		mainFrame.setSize(600,400);
-		mainFrame.setTitle("Player");*/
-		
 		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		EmbeddedMediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();
