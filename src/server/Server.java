@@ -21,7 +21,7 @@ public class Server {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	ObjectOutputStream outputToClient;
-	private int port = 1140;
+	private int port = 1139;
 	private ObjectInputStream videoToStream;
 	private VideoFile fileToStream;
 
@@ -96,6 +96,7 @@ public class Server {
 			System.out.println("Exception thrown whilst streaming.");
 			e.printStackTrace();
 		}
+		System.out.println("finished playing video");
 	}
 	private String formatRtpStream(String serverAddress, int serverPort) {
 		StringBuilder sb = new StringBuilder(60);

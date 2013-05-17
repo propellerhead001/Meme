@@ -28,7 +28,7 @@ import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 
 public class Client implements ActionListener {
 	private Socket serverSocket;
-	private int port = 1140;
+	private int port = 1139;
 	private String host = "127.0.0.1";
 	private ObjectInputStream inputFromServer;
 	private ObjectOutputStream outputToServer;
@@ -36,8 +36,17 @@ public class Client implements ActionListener {
 	public JComboBox<String> selectionBox;
 	private VideoFile videoFile;
 	private static JFrame mainFrame;
+	private JFrame frame;
+	private JPanel panel;
 	
 	public Client(){
+		connectToServer();
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
+		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+		setupGUI();
+	}
+	private void connectToServer() {
 		try {
 			openSocket();
 			getListFromSocket();
@@ -52,10 +61,6 @@ public class Client implements ActionListener {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
-		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
-		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
-		setupGUI();
 	}
 	public static void main(String[] args) {
 		new Client();
@@ -68,8 +73,8 @@ public class Client implements ActionListener {
 		{
 			selectionListData[i] = videoList.get(i).getTitle().toString();
 		}
-		JFrame frame = new JFrame();
-		JPanel panel = new JPanel(new BorderLayout());
+		frame = new JFrame();
+		panel = new JPanel(new BorderLayout());
 
 		selectionBox = new JComboBox<String>(selectionListData);
 		selectionBox.setSelectedIndex(0);
@@ -92,6 +97,9 @@ public class Client implements ActionListener {
 			mainFrame.dispose();
 		}
 		
+		requestVideoFromServer();
+	}
+	private void requestVideoFromServer() {
 		try {
 			outputToServer.writeObject(videoFile);
 			serverSocket.close();
@@ -117,13 +125,13 @@ public class Client implements ActionListener {
 		System.out.println("List retrieved");
 	}
 	private void playVideo(String media){
-		mainFrame = new JFrame();
-		JPanel panel = new JPanel(new BorderLayout());
+		/*mainFrame = new JFrame();
+		JPanel panel = new JPanel(new BorderLayout());*/
 		
-		mainFrame.add(panel);
+		/*mainFrame.add(panel);
 		mainFrame.setVisible(true);
 		mainFrame.setSize(600,400);
-		mainFrame.setTitle("Player");
+		mainFrame.setTitle("Player");*/
 		
 		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
