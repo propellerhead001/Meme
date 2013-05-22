@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -109,6 +111,25 @@ public class Client implements ActionListener {
 
 		panel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
+		frame.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosed(){
+				try {
+					outputToServer.writeObject(serverComm);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				serverComm.setInUse(false);
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.exit(0);
+			}
+		});
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -116,21 +137,33 @@ public class Client implements ActionListener {
 		String selectedTitle = (String)comboBox.getSelectedItem();
 		System.out.println("Selected title : " + selectedTitle);
 		videoFile = videoList.get(comboBox.getSelectedIndex());
+		serverComm.setVideo(videoFile);
 		if(mainFrame != null){
 			mainFrame.dispose();
 		}
-		
 		requestVideoFromServer();
+		try {
+			outputToServer.writeObject(serverComm);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	private void requestVideoFromServer() {
 		try {
-			outputToServer.writeObject(videoFile);
-			serverSocket.close();
+			serverComm.setPLay(false);
+			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
-			System.out.println("Failed to send selection / close socket");
+			System.out.println("Failed to send selection");
 			e1.printStackTrace();
 		}
-		
+		serverComm.setPLay(true);
+		try {
+			outputToServer.writeObject(serverComm);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
 	}
 
@@ -148,6 +181,7 @@ public class Client implements ActionListener {
 		System.out.println("List retrieved");
 	}
 	private void playVideo(String media){
+		serverComm.setPLay(true);
 		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		EmbeddedMediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();
