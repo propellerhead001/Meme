@@ -85,6 +85,9 @@ public class Server {
 						if(!play.isAlive()){
 							play.run();
 						}
+						else{
+							play.interrupt();
+						}
 						System.out.println(fileToStream.getTitle().toString());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -93,7 +96,6 @@ public class Server {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					if(play.isAlive())play.interrupt();
 				}
 			}
 			try {
@@ -107,6 +109,8 @@ public class Server {
 	};
 	Thread play = new Thread("Play"){
 		private HeadlessMediaPlayer mediaPlayer;
+		String serverAddress = "127.0.0.1";
+		String options = formatRtpStream(serverAddress, clientPort.getVideoPort());
 		public void run(){
 			MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(fileToStream.getFilename().toString());
 			mediaPlayer = mediaPlayerFactory.newHeadlessMediaPlayer();
@@ -122,9 +126,8 @@ public class Server {
 			}
 			System.out.println("finished playing video");
 		}
-		public boolean isInterrupted(){
-			mediaPlayer.stop();
-			return true;
+		public  void interrupt(){
+			mediaPlayer.playMedia(fileToStream.getFilename().toString(), options, ":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
 		}
 	};
 

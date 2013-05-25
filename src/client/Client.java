@@ -1,11 +1,9 @@
 package client;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,7 +18,6 @@ import javax.swing.JPanel;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
-import server.Server;
 import server.ClientPort;
 import server.VideoFile;
 import uk.co.caprica.vlcj.binding.LibVlc;
@@ -79,10 +76,8 @@ public class Client implements ActionListener {
 		try {
 			serverComm = (ClientPort) inputFromServer.readObject();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Ports retrieved");
@@ -117,14 +112,12 @@ public class Client implements ActionListener {
 				try {
 					outputToServer.writeObject(serverComm);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				serverComm.setInUse(false);
 				try {
 					serverSocket.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				System.exit(0);
@@ -145,7 +138,6 @@ public class Client implements ActionListener {
 		try {
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -161,7 +153,6 @@ public class Client implements ActionListener {
 		try {
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
