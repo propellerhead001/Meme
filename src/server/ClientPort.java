@@ -22,7 +22,7 @@ public class ClientPort implements Serializable {
 	public void setInUse(boolean b) {
 		inUse = b;
 	}
-	public void setPLay(boolean b){
+	public void setPlay(boolean b){
 		play = b;
 	}
 
