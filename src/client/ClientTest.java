@@ -30,3 +30,4 @@ public class ClientTest {
 		assertEquals("Prometheus", comboBox.getSelectedItem());
 	}
 }
+
