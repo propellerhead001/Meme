@@ -128,9 +128,9 @@ public class Client implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
 		String selectedTitle = (String)comboBox.getSelectedItem();
-		System.out.println("Selected title : " + selectedTitle);
 		videoFile = videoList.get(comboBox.getSelectedIndex());
 		serverComm.setVideo(videoFile);
+		System.out.println("Selected title : " + serverComm.getVideo().getTitle());
 		if(mainFrame != null){
 			mainFrame.dispose();
 		}
@@ -144,6 +144,7 @@ public class Client implements ActionListener {
 	private void requestVideoFromServer() {
 		try {
 			serverComm.setPLay(false);
+			outputToServer.reset();
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
 			System.out.println("Failed to send selection");
