@@ -53,6 +53,7 @@ public class Client implements ActionListener, ChangeListener {
 	private static JFrame mainFrame;
 	private JFrame frame;
 	private JPanel panel;
+	private JPanel contPanel;
 	private EmbeddedMediaPlayer mediaPlayer;
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 	// -- Control Panels Buttons
@@ -127,7 +128,7 @@ public class Client implements ActionListener, ChangeListener {
 		
 		frame = new JFrame();
 		panel = new JPanel(new BorderLayout());
-
+		contPanel = new JPanel(new BorderLayout());
 		selectionBox = new JComboBox<String>(selectionListData);
 		selectionBox.setSelectedIndex(0);
 
@@ -136,8 +137,8 @@ public class Client implements ActionListener, ChangeListener {
 		frame.setSize(600,400);
 		frame.setTitle("A Client");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		panel.add(selectionBox, BorderLayout.NORTH);		
+		panel.add(contPanel, BorderLayout.SOUTH);
+		contPanel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
 		frame.addWindowListener(new WindowAdapter()
 		{
@@ -220,6 +221,10 @@ public class Client implements ActionListener, ChangeListener {
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		}
+		if(mediaPlayer.isPlaying()){
+			mediaPlayer.stop();
+			serverComm.setPlay(false);
 		}
 		mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
 		serverComm.setPlay(true);	
@@ -312,6 +317,6 @@ public class Client implements ActionListener, ChangeListener {
 		
 		// Add panels to Main window
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
-		panel.add(controlsPanel, BorderLayout.SOUTH);
+		contPanel.add(controlsPanel, BorderLayout.SOUTH);
 		}
 }
