@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -120,6 +121,7 @@ public class Client implements ActionListener, ChangeListener {
 		{
 			selectionListData[i] = videoList.get(i).getTitle().toString();
 		}
+		
 		frame = new JFrame();
 		panel = new JPanel(new BorderLayout());
 
@@ -130,7 +132,8 @@ public class Client implements ActionListener, ChangeListener {
 		frame.setVisible(true);
 		frame.setSize(600,400);
 		frame.setTitle("A Client");
-
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		panel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
 		frame.addWindowListener(new WindowAdapter()
@@ -224,9 +227,10 @@ public class Client implements ActionListener, ChangeListener {
 		System.out.println("Connected to: " + host + " on port: "+port);
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
 	}
+	
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
-		System.out.println("List retrieved");
+		System.out.println("List retrieved from Server");
 	}
 	
 
@@ -240,6 +244,7 @@ public class Client implements ActionListener, ChangeListener {
 		JPanel bottomPanel = new JPanel();
 		controlsPanel.setLayout(new BorderLayout());
 		bottomPanel.setLayout(new FlowLayout());
+				
 		
 		// Button to show full screen video
 		fullScreenButton = new JButton();
