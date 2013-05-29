@@ -71,8 +71,11 @@ public class Client implements ActionListener, ChangeListener {
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
 		connectToServer();
-		
+
+		mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+		mediaPlayer = mediaPlayerComponent.getMediaPlayer();
 		setupGUI();
+		setupMediaPlayer();
 	}
 	
 	private void connectToServer() {
@@ -150,12 +153,14 @@ public class Client implements ActionListener, ChangeListener {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				frame.dispose();
 				System.exit(0);
 			}
 		});
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		// If the selection box changes, output the selection to the server
 		if(e.getSource() == selectionBox){
 			JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
 			String selectedTitle      = (String)comboBox.getSelectedItem();
@@ -166,6 +171,7 @@ public class Client implements ActionListener, ChangeListener {
 			if(mainFrame != null){
 				mainFrame.dispose();
 			}
+
 			requestVideoFromServer();
 			try {
 				outputToServer.writeObject(serverComm);
@@ -215,7 +221,8 @@ public class Client implements ActionListener, ChangeListener {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
+		mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
+		serverComm.setPlay(true);	
 	}
 
 
@@ -234,18 +241,13 @@ public class Client implements ActionListener, ChangeListener {
 	}
 	
 
-	private void playVideo(String media){
-		mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-		mediaPlayer = mediaPlayerComponent.getMediaPlayer();
-		PlayerControlsPanel controlsPanel = new PlayerControlsPanel(mediaPlayer);			
-		serverComm.setPlay(true);	
-		
+	protected void setupMediaPlayer(){
+		PlayerControlsPanel controlsPanel = new PlayerControlsPanel(mediaPlayer);	
 		// Control Panel components
 		JPanel bottomPanel = new JPanel();
 		controlsPanel.setLayout(new BorderLayout());
 		bottomPanel.setLayout(new FlowLayout());
 				
-		
 		// Button to show full screen video
 		fullScreenButton = new JButton();
 		fullScreenButton.setPreferredSize(new Dimension(25, 25));
@@ -311,7 +313,5 @@ public class Client implements ActionListener, ChangeListener {
 		// Add panels to Main window
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		panel.add(controlsPanel, BorderLayout.SOUTH);
-		
-		mediaPlayer.playMedia(media);
-	}
+		}
 }

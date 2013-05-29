@@ -34,22 +34,23 @@ public class Server {
 
 	public Server(){
 		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		
 		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+		
 		reader = new XMLReader();
 		videoList = reader.getList("videolist.xml");
 		socketThread.run();
 	}
 
 
-	public List<VideoFile> getList() {
-		return videoList;
-	}
+	public List<VideoFile> getList() { return videoList; }
 
 	public static void main(String[] args) {
 		new Server();
 	}
+	
 	Thread socketThread = new Thread("Socket") {
 		public void run() {
 			while(true){
