@@ -71,7 +71,10 @@ public class Client implements ActionListener, ChangeListener {
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 	private JTextArea consoleText;
 	private final static String newline  = "\n";
+	private final static int defaultWidth = 600;
+	private final static int defaultHeight = 400;
 	private boolean settingsOpen = false;
+	private boolean isFullscreen = false;
 	
 	// -- Control Panels Buttons
 	private JButton fullScreenButton;
@@ -174,7 +177,7 @@ public class Client implements ActionListener, ChangeListener {
 		selectionBox.setSelectedIndex(0);
 		frame.add(panel);
 		frame.setVisible(true);
-		frame.setSize(600,400);
+		frame.setSize(defaultWidth, defaultHeight);
 		frame.setTitle("Media Player");
 
 		panel.add(consoleText);
@@ -240,8 +243,16 @@ public class Client implements ActionListener, ChangeListener {
 			pauseButton.setVisible(true);
 		}
 		else if(e.getSource() == fullScreenButton){
-			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-			mediaPlayer.toggleFullScreen();
+			if(isFullscreen){
+				frame.setBounds(0, 0, defaultWidth, defaultHeight);
+				mediaPlayer.toggleFullScreen();
+				isFullscreen = false;
+			}
+			else if(!isFullscreen){
+				frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				mediaPlayer.toggleFullScreen();
+				isFullscreen = true;
+			}
 		}
 		else if(e.getSource() == pauseButton){
 			serverComm.setPause(true);
