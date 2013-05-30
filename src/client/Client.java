@@ -158,6 +158,7 @@ public class Client implements ActionListener, ChangeListener {
 			public void windowClosing(WindowEvent event){
 				serverComm.setInUse(false);
 				try {
+					outputToServer.reset();
 					outputToServer.writeObject(serverComm);
 					mediaPlayer.stop();
 					mediaPlayer.release();
@@ -165,7 +166,7 @@ public class Client implements ActionListener, ChangeListener {
 					e1.printStackTrace();
 				}
 				try {
-					Thread.sleep(100);
+					Thread.sleep(1000);
 					} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -182,9 +183,9 @@ public class Client implements ActionListener, ChangeListener {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		serverComm.setPlay(false);
 		// If the selection box changes, output the selection to the server
 		if(e.getSource() == selectionBox){
+			serverComm.setPlay(false);
 			JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
 			videoFile = videoList.get(comboBox.getSelectedIndex());
 
@@ -198,35 +199,40 @@ public class Client implements ActionListener, ChangeListener {
 			}
 			if(mediaPlayer.isPlaying()){
 				mediaPlayer.stop();
-				serverComm.setPlay(false);
 			}
 			mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
 		}
 		else if(e.getSource() == fullScreenButton){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			mediaPlayer.toggleFullScreen();
-			serverComm.setPlay(true);
 		}
 		else if(e.getSource() == pauseButton){
 			serverComm.setPause(true);
 			playButton.setVisible(true);
 			pauseButton.setVisible(false);
+			serverComm.setPlay(false);
 		}
 		else if(e.getSource() == playButton){
 			serverComm.setPlayB(true);
 			playButton.setVisible(false);
 			pauseButton.setVisible(true);
+			serverComm.setPlay(false);
 		}
 		else if(e.getSource() == stopButton){
 			serverComm.setStop(true);
+			playButton.setVisible(true);
+			pauseButton.setVisible(false);
+			serverComm.setPlay(false);
 		}
 		else if(e.getSource() == ffwButton){
 			// Insert call to server to skip 10s
 			serverComm.setFfwd(true);
+			serverComm.setPlay(false);
 		}
 		else if(e.getSource() == rewindButton){
 			// Insert call to server to skip back 10
 			serverComm.setRwd(true);
+			serverComm.setPlay(false);
 		}
 		else if(e.getSource() == muteVolumeButton){
 			if(!isMute){
