@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -63,7 +65,15 @@ public class Client implements ActionListener, ChangeListener {
 	private JButton rewindButton;
 	private JButton ffwButton;
 	private JButton stopButton;
-	private JSlider volumeSlider;
+	private JButton videoSettingsButton;
+	
+	// pertaining to volume settings
+	private JButton muteVolumeButton;
+	private JSlider volumeSlider;	
+	private ImageIcon soundMuteIcon;
+	private ImageIcon soundIcon;	
+	private boolean isMute = false;
+	private int soundLevel = 1;
 	
 	public Client(){
 		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
@@ -199,9 +209,13 @@ public class Client implements ActionListener, ChangeListener {
 		}
 		else if(e.getSource() == pauseButton){
 			serverComm.setPause(true);
+			playButton.setVisible(true);
+			pauseButton.setVisible(false);
 		}
 		else if(e.getSource() == playButton){
 			serverComm.setPlayB(true);
+			playButton.setVisible(false);
+			pauseButton.setVisible(true);
 		}
 		else if(e.getSource() == stopButton){
 			serverComm.setStop(true);
@@ -213,6 +227,19 @@ public class Client implements ActionListener, ChangeListener {
 		else if(e.getSource() == rewindButton){
 			// Insert call to server to skip back 10
 			serverComm.setRwd(true);
+		}
+		else if(e.getSource() == muteVolumeButton){
+			if(!isMute){
+				soundLevel = volumeSlider.getValue();
+				volumeSlider.setValue(LibVlcConst.MIN_VOLUME);
+				muteVolumeButton.setIcon(soundMuteIcon);
+				isMute = true;
+			}
+			else if(isMute){
+				volumeSlider.setValue(soundLevel);
+				muteVolumeButton.setIcon(soundIcon);
+				isMute = false;
+			}
 		}
 		//send details to server
 		try {
@@ -277,15 +304,29 @@ public class Client implements ActionListener, ChangeListener {
 
 	protected void setupMediaPlayer(){
 		PlayerControlsPanel controlsPanel = new PlayerControlsPanel(mediaPlayer);	
+		
 		// Control Panel components
-		JPanel bottomPanel = new JPanel();
+		JPanel bottomPanelLeft = new JPanel();
+		JPanel bottomPanelRight = new JPanel();
+		JPanel bottomPanelCentre = new JPanel();
+		
+		EmptyBorder borderSize = new EmptyBorder(0,0,0,0);
+		
 		controlsPanel.setLayout(new BorderLayout());
-		bottomPanel.setLayout(new FlowLayout());
+		bottomPanelLeft.setLayout(new FlowLayout());
+		bottomPanelRight.setLayout(new FlowLayout());
+		bottomPanelCentre.setLayout(new FlowLayout());
+		
+		panel.setBorder(borderSize);
+		controlsPanel.setBorder(borderSize);
+		bottomPanelLeft.setBorder(borderSize);
+		bottomPanelCentre.setBorder(borderSize);
+		bottomPanelRight.setBorder(borderSize);
 				
 		// Button to show full screen video
 		fullScreenButton = new JButton();
 		fullScreenButton.setPreferredSize(new Dimension(25, 25));
-		fullScreenButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/connect.png")));
+		fullScreenButton.setIcon(new ImageIcon("icons/arrow_out.png"));
 		fullScreenButton.setToolTipText("Full Screen Video");
 		fullScreenButton.addActionListener((ActionListener) this);
 		
@@ -305,17 +346,19 @@ public class Client implements ActionListener, ChangeListener {
 		
 		// Pause Button
 		pauseButton = new JButton();
-		pauseButton.setPreferredSize(new Dimension(25, 25));
+		pauseButton.setPreferredSize(new Dimension(35, 35));
 		pauseButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/control_pause_blue.png")));
 		pauseButton.setToolTipText("Pause Video");
 		pauseButton.addActionListener((ActionListener) this);
+		pauseButton.setVisible(true);
 		
 		// Play Button
 		playButton = new JButton();
-		playButton.setPreferredSize(new Dimension(25, 25));
+		playButton.setPreferredSize(new Dimension(35, 35));
 		playButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/control_play_blue.png")));
 		playButton.setToolTipText("Resume Playback");
 		playButton.addActionListener((ActionListener) this);
+		playButton.setVisible(false);
 		
 		// Fast Forward Button
 		ffwButton = new JButton();
@@ -323,6 +366,22 @@ public class Client implements ActionListener, ChangeListener {
 		ffwButton.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/control_fastforward_blue.png")));
 		ffwButton.setToolTipText("Fast forward video");
 		ffwButton.addActionListener((ActionListener) this);
+		
+		// Video Settings Button
+		videoSettingsButton = new JButton();
+		videoSettingsButton.setPreferredSize(new Dimension(25, 25));
+		videoSettingsButton.setIcon(new ImageIcon("icons/film_edit.png"));
+		videoSettingsButton.setToolTipText("Change Video Settings");
+		videoSettingsButton.addActionListener((ActionListener) this);
+		
+		// Mute Volume Button
+		soundMuteIcon = new ImageIcon("icons/sound_mute.png");
+		soundIcon = new ImageIcon("icons/sound.png");
+		muteVolumeButton = new JButton();
+		muteVolumeButton.setPreferredSize(new Dimension(25, 25));
+		muteVolumeButton.setIcon(soundIcon);
+		muteVolumeButton.setToolTipText("Mute Volume");
+		muteVolumeButton.addActionListener((ActionListener) this);
 		
 		// Volume Slider
 		volumeSlider = new JSlider();
@@ -335,17 +394,35 @@ public class Client implements ActionListener, ChangeListener {
 		volumeSlider.addChangeListener((ChangeListener) this);
 		
 		// Add buttons to Control Panel
-		controlsPanel.add(bottomPanel);
-		bottomPanel.add(fullScreenButton);
-		bottomPanel.add(rewindButton);
-		bottomPanel.add(stopButton);
-		bottomPanel.add(pauseButton);
-		bottomPanel.add(playButton);
-		bottomPanel.add(ffwButton);
-		bottomPanel.add(volumeSlider);
+		controlsPanel.add(bottomPanelLeft, BorderLayout.WEST);
+		controlsPanel.add(bottomPanelCentre, BorderLayout.CENTER);
+		controlsPanel.add(bottomPanelRight, BorderLayout.EAST);
+		
+		bottomPanelLeft.add(pauseButton);
+		bottomPanelLeft.add(playButton);
+		bottomPanelLeft.add(Box.createRigidArea(new Dimension(2,0)));
+		bottomPanelLeft.add(rewindButton);
+		bottomPanelLeft.add(stopButton);
+		bottomPanelLeft.add(ffwButton);		
+		bottomPanelLeft.add(Box.createRigidArea(new Dimension(1,0)));
+		bottomPanelLeft.add(fullScreenButton);
+		bottomPanelLeft.add(videoSettingsButton);
+
+		
+		bottomPanelRight.add(muteVolumeButton);
+		bottomPanelRight.add(volumeSlider);
 		
 		// Add panels to Main window
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		contPanel.add(controlsPanel, BorderLayout.SOUTH);
 		}
+
+
+		private void videoSettingsDialog(){
+			JFrame videoSettingsFrame = new JFrame();
+			
+		}
+
+
+
 }
