@@ -12,16 +12,17 @@ import org.junit.Test;
 
 import server.Server;
 import server.VideoFile;
-public class ClientTestVidFile {
+public class ClientTest {
 	private Client client;
+	private static Thread serverThread;
 	private static Server server;
-	private static Thread serverThread = new Thread("server"){
-		public void run(){
-			server = new Server(true);
-		}
-	};
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUp() throws Exception {
+		serverThread = new Thread("server"){
+			public void run(){
+				server = new Server(true);
+			}
+		};
 		serverThread.start();
 	}
 	@Test
@@ -31,6 +32,13 @@ public class ClientTestVidFile {
 		assertEquals("20120213a2", videoFile.getID());
 		assertNotNull("Monsters Inc.", videoFile.getTitle());
 		assertNotNull("monstersinc_high.mpg", videoFile.getFilename());
+	}
+	@Test
+	public void checkSelectedVideoInList() {
+		client = new Client();
+		JComboBox<String> comboBox = client.selectionBox;
+		comboBox.setSelectedIndex(2);
+		assertEquals("Prometheus", comboBox.getSelectedItem());
 	}
 }
 
