@@ -46,6 +46,7 @@ public class Client implements ActionListener {
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		setupGUI();
+		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
 	}
 	private void connectToServer() {
 		try {
@@ -66,10 +67,9 @@ public class Client implements ActionListener {
 			System.exit(-1);
 		}
 	}
-	private void openCommSocket(int commPort) throws IOException {
-		
+	private void openCommSocket(int commPort) throws IOException {	
 		serverSocket = new Socket(host, commPort);
-		System.out.println("Connected to: " + host + " on port: "+port);
+		System.out.println("Connected to: " + host + " on port: "+ commPort);
 		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getPortsFromSocket() {
@@ -129,34 +129,17 @@ public class Client implements ActionListener {
 		JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
 		String selectedTitle = (String)comboBox.getSelectedItem();
 		videoFile = videoList.get(comboBox.getSelectedIndex());
-		serverComm.setVideo(videoFile);
-		System.out.println("Selected title : " + serverComm.getVideo().getTitle());
+		serverComm.setPLay(false);
+		System.out.println("Selected title : " + videoFile.getTitle());
 		if(mainFrame != null){
 			mainFrame.dispose();
 		}
-		requestVideoFromServer();
+		serverComm.setVideo(videoFile);
 		try {
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-	}
-	private void requestVideoFromServer() {
-		try {
-			serverComm.setPLay(false);
-			outputToServer.reset();
-			outputToServer.writeObject(serverComm);
-		} catch (IOException e1) {
-			System.out.println("Failed to send selection");
-			e1.printStackTrace();
-		}
-		serverComm.setPLay(true);
-		try {
-			outputToServer.writeObject(serverComm);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		playVideo("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort()));
 	}
 
 
@@ -173,7 +156,6 @@ public class Client implements ActionListener {
 		System.out.println("List retrieved");
 	}
 	private void playVideo(String media){
-		serverComm.setPLay(true);
 		final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER);
 		EmbeddedMediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();

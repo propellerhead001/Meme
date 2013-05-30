@@ -26,7 +26,6 @@ public class ClientObject {
 		playerThread.run();
 	}
 	ObjectOutputStream outputToClient;
-	private ObjectInputStream videoToStream;
 	private ClientPort clientPort;
 	private ServerSocket playerSocket;
 	private Socket clientCommSocket = new Socket();
@@ -39,14 +38,37 @@ public class ClientObject {
 			cleanClient = getStatusFromSocket();
 			HeadlessMediaPlayer mediaPlayer;
 			String serverAddress = clientPort.getAddress();
-			
+			try {
+				playerSocket.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			while(true){
+				try {
+					playerSocket.accept();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				cleanClient = getStatusFromSocket();
+				try {
+					playerSocket.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				String options = formatRtpStream(serverAddress, clientPort.getVideoPort());
-				if(!cleanClient.getPlay()){
+				MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(cleanClient.getVideo().getFilename().toString());
+				mediaPlayer = mediaPlayerFactory.newHeadlessMediaPlayer();
+				mediaPlayer.stop();
+				mediaPlayer.playMedia(cleanClient.getVideo().getFilename().toString(), options,
+						":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
+				if(true){
 					System.out.println(cleanClient.getVideo().getTitle().toString());
-					MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(cleanClient.getVideo().getFilename().toString());
+					mediaPlayerFactory = new MediaPlayerFactory(cleanClient.getVideo().getFilename().toString());
 					mediaPlayer = mediaPlayerFactory.newHeadlessMediaPlayer();
+					mediaPlayer.stop();
 					mediaPlayer.playMedia(cleanClient.getVideo().getFilename().toString(), options,
 							":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
 				}
@@ -71,7 +93,6 @@ public class ClientObject {
 	}
 
 	protected ClientPort getStatusFromSocket() {
-		videoToStream = clientUpdate;
 		try {
 			clientPort =(ClientPort) clientUpdate.readObject();
 			return clientPort;
