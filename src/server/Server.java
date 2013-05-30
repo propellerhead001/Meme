@@ -24,13 +24,8 @@ public class Server {
 	private Socket clientSocket;
 	ObjectOutputStream outputToClient;
 	private int port = 1139;
-	private ArrayList<ObjectInputStream> videoToStream = new ArrayList(0);
-	private VideoFile fileToStream;
 	private ClientPort clientPort = new ClientPort("127.0.0.1", 1140, 1141);
-	private ArrayList<ServerSocket> playerSocket= new ArrayList(0);
-	private ArrayList<Socket> clientCommSocket= new ArrayList(0);
-	private ObjectInputStream clientUpdate;
-	private ClientObject clients;
+	private ArrayList <ClientObject> clients = new ArrayList(0);
 
 	public Server(){
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
@@ -61,7 +56,9 @@ public class Server {
 				openSocket(port);
 				writeListToSocket();
 				writePortToSocket();
-				clients = new ClientObject(clientPort);
+				clients.add(new ClientObject(clientPort));
+				clientPort = new ClientPort(clientPort.getAddress(),
+						clientPort.getCommPort()+2,clientPort.getVideoPort()+2);
 				clientSocket.close();
 				serverSocket.close();
 			} catch (IOException e) {

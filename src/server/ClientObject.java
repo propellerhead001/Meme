@@ -23,10 +23,9 @@ import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
 public class ClientObject {
 	ClientObject(ClientPort clientDetails){
 		clientPort = clientDetails;
-		playerThread.run();
+		playerThread.start();
 	}
 	ObjectOutputStream outputToClient;
-	private ObjectInputStream videoToStream;
 	private ClientPort clientPort;
 	private ServerSocket playerSocket;
 	private Socket clientCommSocket = new Socket();
@@ -36,21 +35,54 @@ public class ClientObject {
 		public void run(){
 			openCommSocket(clientPort.getCommPort());
 			clientPort.setInUse(true);
-			cleanClient = getStatusFromSocket();
-			HeadlessMediaPlayer mediaPlayer;
-			String serverAddress = clientPort.getAddress();
-			
-			while(true){
+			try {
 				cleanClient = getStatusFromSocket();
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			cleanClient.setInUse(true);
+			HeadlessMediaPlayer mediaPlayer;
+			MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(cleanClient.getVideo().getFilename().toString());
+			mediaPlayer = mediaPlayerFactory.newHeadlessMediaPlayer();
+			String serverAddress = clientPort.getAddress();
+			try {
+				cleanClient = getStatusFromSocket();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				cleanClient.setInUse(false);
+			}
+
+			while(cleanClient.getInUse()){
+				try{
+					cleanClient = getStatusFromSocket();
+				} catch (ClassNotFoundException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					cleanClient.setInUse(false);
+				}
 				String options = formatRtpStream(serverAddress, clientPort.getVideoPort());
 				if(!cleanClient.getPlay()){
 					System.out.println(cleanClient.getVideo().getTitle().toString());
-					MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory(cleanClient.getVideo().getFilename().toString());
-					mediaPlayer = mediaPlayerFactory.newHeadlessMediaPlayer();
+					mediaPlayer.stop();
 					mediaPlayer.playMedia(cleanClient.getVideo().getFilename().toString(), options,
 							":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
 				}
 			}
+			try {
+				playerSocket.close();
+				clientCommSocket.close();
+				System.out.println("Client at " + clientPort.getAddress() + " has closed");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 		}
 	};
 	private void openCommSocket(int commPort) {
@@ -70,16 +102,10 @@ public class ClientObject {
 		}
 	}
 
-	protected ClientPort getStatusFromSocket() {
-		videoToStream = clientUpdate;
-		try {
+	protected ClientPort getStatusFromSocket() throws ClassNotFoundException, IOException {
 			clientPort =(ClientPort) clientUpdate.readObject();
 			return clientPort;
-		} catch (ClassNotFoundException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return clientPort;
-		}
+		
 	}
 	private String formatRtpStream(String serverAddress, int serverPort) {
 		StringBuilder sb = new StringBuilder(60);
