@@ -73,6 +73,8 @@ public class ClientObject {
 							":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
 				}
 			}
+			mediaPlayer.stop();
+			mediaPlayer.release();
 			try {
 				playerSocket.close();
 				clientCommSocket.close();

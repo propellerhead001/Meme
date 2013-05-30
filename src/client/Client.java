@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -87,13 +88,13 @@ public class Client implements ActionListener, ChangeListener {
 			serverSocket.close();
 			openCommSocket(serverComm.getCommPort());
 		} catch (UnknownHostException e) {
-			System.out.println("Don't know about host : " + host);
+			System.out.println("Client: Don't know about host : " + host);
 			System.exit(-1);
 		} catch (IOException e) {
-			System.out.println("Couldn't open I/O connection : " + host + ":" + port);
+			System.out.println("Client: Couldn't open I/O connection : " + host + ":" + port);
 			System.exit(-1);
 		} catch (ClassNotFoundException e) {
-			System.out.println("Class definition not found for incoming object.");
+			System.out.println("Client: Class definition not found for incoming object.");
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -101,8 +102,8 @@ public class Client implements ActionListener, ChangeListener {
 	private void openCommSocket(int commPort) throws IOException {
 		
 		serverSocket = new Socket(host, commPort);
-		System.out.println("Connected to: " + serverComm.getAddress() + " on port: "+serverComm.getCommPort());
-		System.out.println("Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort());
+		System.out.println("Client: Connected to: " + serverComm.getAddress() + " on port: "+serverComm.getCommPort());
+		System.out.println("Client: Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort());
 		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getPortsFromSocket() {
@@ -113,7 +114,8 @@ public class Client implements ActionListener, ChangeListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Ports retrieved");
+		serverComm.setInUse(true);
+		System.out.println("Client: Ports retrieved");
 	}
 	public static void main(String[] args) {
 		new Client();
@@ -136,19 +138,27 @@ public class Client implements ActionListener, ChangeListener {
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.setSize(600,400);
-		frame.setTitle("A Client");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setTitle("Media Player");
+		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		panel.add(contPanel, BorderLayout.SOUTH);
 		contPanel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
 		frame.addWindowListener(new WindowAdapter()
 		{
-			public void windowClosed(){
-
+			@Override
+			public void windowClosing(WindowEvent event){
 				serverComm.setInUse(false);
 				try {
 					outputToServer.writeObject(serverComm);
+					mediaPlayer.stop();
+					mediaPlayer.release();
 				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				try {
+					Thread.sleep(100);
+					} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				try {
@@ -170,7 +180,7 @@ public class Client implements ActionListener, ChangeListener {
 			videoFile = videoList.get(comboBox.getSelectedIndex());
 
 			serverComm.setVideo(videoFile);
-			System.out.println("Selected title : " + serverComm.getVideo().getTitle());
+			System.out.println("Client: Selected title : " + serverComm.getVideo().getTitle());
 			if(mainFrame != null){
 				mainFrame.dispose();
 			}
@@ -215,7 +225,7 @@ public class Client implements ActionListener, ChangeListener {
 			outputToServer.reset();
 			outputToServer.writeObject(serverComm);
 		} catch (IOException e1) {
-			System.out.println("Failed to send selection");
+			System.out.println("Client: Failed to send selection");
 			e1.printStackTrace();
 		}
 		serverComm.setPlay(true);
@@ -244,7 +254,7 @@ public class Client implements ActionListener, ChangeListener {
 	
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
-		System.out.println("List retrieved from Server");
+		System.out.println("Client: List retrieved from Server");
 	}
 	
 
