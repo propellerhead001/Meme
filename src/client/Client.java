@@ -66,8 +66,8 @@ public class Client implements ActionListener, ChangeListener {
 	private JSlider volumeSlider;
 	
 	public Client(){
-		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
-		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
@@ -101,7 +101,8 @@ public class Client implements ActionListener, ChangeListener {
 	private void openCommSocket(int commPort) throws IOException {
 		
 		serverSocket = new Socket(host, commPort);
-		System.out.println("Connected to: " + host + " on port: "+port);
+		System.out.println("Connected to: " + serverComm.getAddress() + " on port: "+serverComm.getCommPort());
+		System.out.println("Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort());
 		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getPortsFromSocket() {
@@ -143,12 +144,13 @@ public class Client implements ActionListener, ChangeListener {
 		frame.addWindowListener(new WindowAdapter()
 		{
 			public void windowClosed(){
+
+				serverComm.setInUse(false);
 				try {
 					outputToServer.writeObject(serverComm);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				serverComm.setInUse(false);
 				try {
 					serverSocket.close();
 				} catch (IOException e) {

@@ -33,15 +33,19 @@ public class Server {
 	private ClientObject clients;
 
 	public Server(){
-		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		
-		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
 		reader = new XMLReader();
 		videoList = reader.getList("videolist.xml");
-		socketThread.run();
+		while(true){
+			if(!socketThread.isAlive()){
+				socketThread.run();
+			}
+		}
 	}
 
 
@@ -53,19 +57,18 @@ public class Server {
 	
 	Thread socketThread = new Thread("Socket") {
 		public void run() {
-			while(true){
-				try {
-					openSocket(port);
-					writeListToSocket();
-					writePortToSocket();
-					clients = new ClientObject(clientPort);
-					clientSocket.close();
-					serverSocket.close();
-				} catch (IOException e) {
-					System.out.println("ERROR on socket connection.");
-					e.printStackTrace();
-				}
+			try {
+				openSocket(port);
+				writeListToSocket();
+				writePortToSocket();
+				clients = new ClientObject(clientPort);
+				clientSocket.close();
+				serverSocket.close();
+			} catch (IOException e) {
+				System.out.println("ERROR on socket connection.");
+				e.printStackTrace();
 			}
+
 		}
 	};
 

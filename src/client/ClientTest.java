@@ -15,6 +15,7 @@ public class ClientTest {
 	public void setUp() throws Exception {
 		server.Server.main(null);
 		client = new Client();
+		client.main(null);
 	}
 	@Test
 	public void videoFileReturnsCorrectValue() {
