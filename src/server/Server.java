@@ -30,9 +30,9 @@ public class Server {
 	public Server(boolean multi){
 		// multi allows the server to be started as either a single client / single server
 		//or multi-client / single server
-		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		
-		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		

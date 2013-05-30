@@ -3,6 +3,7 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -15,6 +16,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -55,14 +57,21 @@ public class Client implements ActionListener, ChangeListener {
 	
 	// GUI Elements
 	private JFrame frame;
+	private JFrame videoFrame;
 	private JPanel panel;
+	private JPanel videoPanel;
+	private JPanel labelPanel;
+	private JPanel sliderPanel;
 	private JPanel contPanel;
+	private JSlider gammaSlider;
+	private JSlider saturationSlider;
+	private JSlider hueSlider;
+	private JSlider brightnessSlider;
 	private EmbeddedMediaPlayer mediaPlayer;
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
-	private ImageIcon loadingImage;
-	private JLabel loadingHolder;
 	private JTextArea consoleText;
 	private final static String newline  = "\n";
+	private boolean settingsOpen = false;
 	
 	// -- Control Panels Buttons
 	private JButton fullScreenButton;
@@ -82,10 +91,11 @@ public class Client implements ActionListener, ChangeListener {
 	private int soundLevel = 1;
 	
 	public Client(){
-		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
-		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+		
 		consoleText = new JTextArea();
 		consoleText.setBounds(50,50,200,100);
 		consoleText.setVisible(true);
@@ -93,6 +103,7 @@ public class Client implements ActionListener, ChangeListener {
 		consoleText.append("  ----------------------------------------------------  " + newline);
 		consoleText.append("| Select a trailer to play from the menu   |" + newline);
 		consoleText.append("  ---------------------------------------------------- " + newline);
+		
 		connectToServer();
 
 		mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
@@ -238,6 +249,17 @@ public class Client implements ActionListener, ChangeListener {
 			pauseButton.setVisible(false);
 			serverComm.setPlay(false);
 		}
+		else if(e.getSource() == videoSettingsButton){
+			if(settingsOpen){
+				videoFrame.dispose();
+				settingsOpen = false;
+			}
+			else if(!settingsOpen){
+				videoSettingsDialog();
+				settingsOpen = true;
+			}
+
+		}
 		else if(e.getSource() == playButton){
 			serverComm.setPlayB(true);
 			playButton.setVisible(false);
@@ -290,10 +312,11 @@ public class Client implements ActionListener, ChangeListener {
 	}
 	
 	public void stateChanged(ChangeEvent e){
+		JSlider source = (JSlider)e.getSource();
 		if(e.getSource() == volumeSlider){
-			JSlider source = (JSlider)e.getSource();
 			mediaPlayer.setVolume(source.getValue());
 		}
+
 	}
 	private void requestVideoFromServer() {
 		try {
@@ -451,12 +474,115 @@ public class Client implements ActionListener, ChangeListener {
 		contPanel.add(controlsPanel, BorderLayout.SOUTH);
 		}
 
+	public void videoSettingsDialog(){
 
-		private void videoSettingsDialog(){
-			JFrame videoSettingsFrame = new JFrame();
-			
-		}
+		videoFrame  = new JFrame();
+		videoPanel  = new JPanel();
+		labelPanel  = new JPanel();
+		sliderPanel = new JPanel();
+		
+		videoFrame.add(videoPanel);
+		videoFrame.setVisible(true);
+		videoFrame.setTitle("Video Settings");
+		videoFrame.setBounds(frame.getX() + frame.getWidth(), frame.getY(), 200, frame.getHeight());
+		
+		JLabel hueLabel		   = new JLabel("Hue");
+		JLabel brightnessLabel = new JLabel("Brightness");
+		JLabel saturationLabel = new JLabel("Saturation");
+		JLabel gammaLabel      = new JLabel("Gamma");
 
+		hueSlider = new JSlider();
+	    hueSlider.setOrientation(JSlider.HORIZONTAL);
+	    hueSlider.setMinimum(LibVlcConst.MIN_HUE);
+	    hueSlider.setMaximum(LibVlcConst.MAX_HUE);
+	    hueSlider.setPreferredSize(new Dimension(100, 40));
+	    hueSlider.setToolTipText("Adjust the hue settings");
+	    hueSlider.setEnabled(true);
+	    
+	    brightnessSlider = new JSlider();
+	    brightnessSlider.setOrientation(JSlider.HORIZONTAL);
+	    brightnessSlider.setMinimum(Math.round(LibVlcConst.MIN_BRIGHTNESS * 100.0f));
+	    brightnessSlider.setMaximum(Math.round(LibVlcConst.MAX_BRIGHTNESS * 100.0f));
+	    brightnessSlider.setPreferredSize(new Dimension(100, 40));
+	    brightnessSlider.setToolTipText("Change Brightness settings");
+	    brightnessSlider.setEnabled(true);
+	    
+	    saturationSlider = new JSlider();
+	    saturationSlider.setOrientation(JSlider.HORIZONTAL);
+	    saturationSlider.setMinimum(Math.round(LibVlcConst.MIN_SATURATION * 100.0f));
+	    saturationSlider.setMaximum(Math.round(LibVlcConst.MAX_SATURATION * 100.0f));
+	    saturationSlider.setPreferredSize(new Dimension(100, 40));
+	    saturationSlider.setToolTipText("Change saturation settings");
+	    saturationSlider.setEnabled(true);
+	    
+	    gammaSlider = new JSlider();
+	    gammaSlider.setOrientation(JSlider.HORIZONTAL);
+	    gammaSlider.setMinimum(Math.round(LibVlcConst.MIN_GAMMA * 100.0f));
+	    gammaSlider.setMaximum(Math.round(LibVlcConst.MAX_GAMMA * 100.0f));
+	    gammaSlider.setPreferredSize(new Dimension(100, 40));
+	    gammaSlider.setToolTipText("Change gamma settings ");
+	    gammaSlider.setEnabled(false);
+	    
+	    brightnessSlider.setValue(Math.round(mediaPlayer.getContrast() * 100.0f));
+	    hueSlider.setValue(mediaPlayer.getHue());
+	    saturationSlider.setValue(Math.round(mediaPlayer.getSaturation() * 100.0f));
+	    gammaSlider.setValue(Math.round(mediaPlayer.getGamma() * 100.0f));
+	    mediaPlayer.setAdjustVideo(true);
+	    
+	    
+	    brightnessSlider.addChangeListener(new ChangeListener(){
+	    	@Override
+	    	public void stateChanged(ChangeEvent e){	    		
+	    		JSlider source = (JSlider)e.getSource();
+	    		if(e.getSource() == brightnessSlider){
+	    			mediaPlayer.setGamma(source.getValue() / 100.0f);
+	    		}	    		
+	    	}
+	    });
+	    hueSlider.addChangeListener(new ChangeListener(){
+	    	@Override
+	    	public void stateChanged(ChangeEvent e){	    		
+	    		JSlider source = (JSlider)e.getSource();
+	    		if(e.getSource() == hueSlider){
+	    			mediaPlayer.setHue(source.getValue());
+	    		}	    		
+	    	}
+	    });
+	    saturationSlider.addChangeListener(new ChangeListener(){
+	    	@Override
+	    	public void stateChanged(ChangeEvent e){	    		
+	    		JSlider source = (JSlider)e.getSource();
+	    		if(e.getSource() == saturationSlider){
+	    			mediaPlayer.setSaturation(source.getValue() / 100.0f);
+	    		}	    		
+	    	}
+	    });
+	    gammaSlider.addChangeListener(new ChangeListener(){
+	    	@Override
+	    	public void stateChanged(ChangeEvent e){	    		
+	    		JSlider source = (JSlider)e.getSource();
+	    		if(e.getSource() == gammaSlider){
+	    			mediaPlayer.setGamma(source.getValue() / 100.0f);
+	    		}	    		
+	    	}
+	    });
+	    
+	    
+	    videoPanel.setLayout(new BorderLayout());
+	    sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.Y_AXIS));
+	    
+	    sliderPanel.add(hueLabel);
+	    sliderPanel.add(hueSlider);
+	    sliderPanel.add(brightnessLabel);
+	    sliderPanel.add(brightnessSlider);
+	    sliderPanel.add(gammaLabel);
+	    sliderPanel.add(gammaSlider);
+	    sliderPanel.add(saturationLabel);
+	    sliderPanel.add(saturationSlider);
+	    
 
+	    videoPanel.add(sliderPanel, BorderLayout.CENTER);
+	
+	}
 
 }
