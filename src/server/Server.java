@@ -27,7 +27,9 @@ public class Server {
 	private ClientPort clientPort = new ClientPort("127.0.0.1", 1140, 1141);
 	private ArrayList <ClientObject> clients = new ArrayList(0);
 
-	public Server(){
+	public Server(boolean multi){
+		// multi allows the server to be started as either a single client / single server
+		//or multi-client / single server
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		
 		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
@@ -36,18 +38,19 @@ public class Server {
 		
 		reader = new XMLReader();
 		videoList = reader.getList("videolist.xml");
-		while(true){
+		//ensure that at least one client can connect
+		do{
 			if(!socketThread.isAlive()){
 				socketThread.run();
 			}
-		}
+		}while(multi);
 	}
 
 
 	public List<VideoFile> getList() { return videoList; }
 
 	public static void main(String[] args) {
-		new Server();
+		new Server(true);
 	}
 	
 	Thread socketThread = new Thread("Socket") {
@@ -74,7 +77,7 @@ public class Server {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			System.out.println("Could not listen on port : " + port);
-			System.exit(-1);
+			e.printStackTrace();
 		}
 		System.out.println("Opened socket on : " + port + ", waiting for client.");
 
@@ -82,7 +85,7 @@ public class Server {
 			clientSocket = serverSocket.accept();
 		} catch (IOException e) {
 			System.out.println("Could not accept client.");
-			System.exit(-1);
+			e.printStackTrace();
 		}
 		outputToClient = new ObjectOutputStream(clientSocket.getOutputStream());
 	}

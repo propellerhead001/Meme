@@ -11,7 +11,7 @@ public class ServerTest {
 	private List<VideoFile> serverList;
 	@Test
 	public void serverGetsList(){
-		server = new Server();
+		server = new Server(false);
 		serverList = server.getList();
 		
 		// Check serverList is a list
