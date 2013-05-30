@@ -54,10 +54,10 @@ public class ClientObject {
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-				cleanClient.setInUse(false);
 			}
-
+			cleanClient.setInUse(true);
 			while(cleanClient.getInUse()){
+				String options = formatRtpStream(serverAddress, clientPort.getVideoPort());
 				try{
 					cleanClient = getStatusFromSocket();
 				} catch (ClassNotFoundException | IOException e1) {
@@ -65,14 +65,35 @@ public class ClientObject {
 					e1.printStackTrace();
 					cleanClient.setInUse(false);
 				}
-				String options = formatRtpStream(serverAddress, clientPort.getVideoPort());
 				if(!cleanClient.getPlay()){
-					System.out.println(cleanClient.getVideo().getTitle().toString());
-					mediaPlayer.stop();
-					mediaPlayer.playMedia(cleanClient.getVideo().getFilename().toString(), options,
-							":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
+					if(cleanClient.isPause()){
+						mediaPlayer.pause();
+						System.out.println("pause");
+					}
+					else if(cleanClient.isStop()){
+						mediaPlayer.stop();
+						System.out.println("stop");
+					}
+					else if(cleanClient.isFfwd()){
+						mediaPlayer.skip(10000);
+						System.out.println("ffwd");
+					}
+					else if(cleanClient.isRwd()){
+						mediaPlayer.skip(-10000);
+						System.out.println("rwd");
+					}
+					else if(cleanClient.isPlayB()){
+						mediaPlayer.play();
+						System.out.println("play");
+					}
+					else{
+						System.out.println(cleanClient.getVideo().getTitle().toString());
+						mediaPlayer.playMedia(cleanClient.getVideo().getFilename().toString(), options,
+								":no-sout-rtp-sap", ":no-sout-standard-sap", ":sout-all", ":sout-keep");
+					}
 				}
 			}
+
 			mediaPlayer.stop();
 			mediaPlayer.release();
 			try {
@@ -83,8 +104,8 @@ public class ClientObject {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
+
 		}
 	};
 	private void openCommSocket(int commPort) {
@@ -105,9 +126,9 @@ public class ClientObject {
 	}
 
 	protected ClientPort getStatusFromSocket() throws ClassNotFoundException, IOException {
-			clientPort =(ClientPort) clientUpdate.readObject();
-			return clientPort;
-		
+		clientPort =(ClientPort) clientUpdate.readObject();
+		return clientPort;
+
 	}
 	private String formatRtpStream(String serverAddress, int serverPort) {
 		StringBuilder sb = new StringBuilder(60);

@@ -51,7 +51,6 @@ public class Client implements ActionListener, ChangeListener {
 	private VideoFile videoFile;
 	
 	// GUI Elements
-	private static JFrame mainFrame;
 	private JFrame frame;
 	private JPanel panel;
 	private JPanel contPanel;
@@ -173,43 +172,61 @@ public class Client implements ActionListener, ChangeListener {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		serverComm.setPlay(false);
 		// If the selection box changes, output the selection to the server
 		if(e.getSource() == selectionBox){
 			JComboBox<String>comboBox = (JComboBox<String>)e.getSource();
-			String selectedTitle      = (String)comboBox.getSelectedItem();
 			videoFile = videoList.get(comboBox.getSelectedIndex());
 
 			serverComm.setVideo(videoFile);
 			System.out.println("Client: Selected title : " + serverComm.getVideo().getTitle());
-			if(mainFrame != null){
-				mainFrame.dispose();
-			}
-
-			requestVideoFromServer();
 			try {
+				outputToServer.reset();
 				outputToServer.writeObject(serverComm);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			if(mediaPlayer.isPlaying()){
+				mediaPlayer.stop();
+				serverComm.setPlay(false);
+			}
+			mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
 		}
 		else if(e.getSource() == fullScreenButton){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			mediaPlayer.toggleFullScreen();
+			serverComm.setPlay(true);
 		}
 		else if(e.getSource() == pauseButton){
-			mediaPlayer.pause();
+			serverComm.setPause(true);
 		}
 		else if(e.getSource() == playButton){
-			mediaPlayer.play();
+			serverComm.setPlayB(true);
 		}
 		else if(e.getSource() == stopButton){
-			mediaPlayer.stop();
+			serverComm.setStop(true);
 		}
 		else if(e.getSource() == ffwButton){
-			// Insert call to server to increase playback speed
+			// Insert call to server to skip 10s
+			serverComm.setFfwd(true);
 		}
 		else if(e.getSource() == rewindButton){
-			// Insert call to server to rewind playback
+			// Insert call to server to skip back 10
+			serverComm.setRwd(true);
+		}
+		//send details to server
+		try {
+			outputToServer.reset();
+			outputToServer.writeObject(serverComm);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		serverComm.setPlay(true);
+		serverComm.clearButtons();
+		try {
+			outputToServer.writeObject(serverComm);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 	
