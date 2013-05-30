@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -58,6 +59,11 @@ public class Client implements ActionListener, ChangeListener {
 	private JPanel contPanel;
 	private EmbeddedMediaPlayer mediaPlayer;
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
+	private ImageIcon loadingImage;
+	private JLabel loadingHolder;
+	private JTextArea consoleText;
+	private final static String newline  = "\n";
+	
 	// -- Control Panels Buttons
 	private JButton fullScreenButton;
 	private JButton playButton;
@@ -80,7 +86,13 @@ public class Client implements ActionListener, ChangeListener {
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
-		
+		consoleText = new JTextArea();
+		consoleText.setBounds(50,50,200,100);
+		consoleText.setVisible(true);
+		consoleText.setBackground(null);
+		consoleText.append("  ----------------------------------------------------  " + newline);
+		consoleText.append("| Select a trailer to play from the menu   |" + newline);
+		consoleText.append("  ---------------------------------------------------- " + newline);
 		connectToServer();
 
 		mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
@@ -112,7 +124,9 @@ public class Client implements ActionListener, ChangeListener {
 		
 		serverSocket = new Socket(host, commPort);
 		System.out.println("Client: Connected to: " + serverComm.getAddress() + " on port: "+serverComm.getCommPort());
+		consoleText.append("Client: Connected to: " + serverComm.getAddress() + " on port: "+serverComm.getCommPort() + newline);
 		System.out.println("Client: Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort());
+		consoleText.append("Client: Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort() + newline);
 		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
 	private void getPortsFromSocket() {
@@ -125,6 +139,8 @@ public class Client implements ActionListener, ChangeListener {
 		}
 		serverComm.setInUse(true);
 		System.out.println("Client: Ports retrieved");
+		consoleText.append("Client: Ports retrieved" + newline);
+		
 	}
 	public static void main(String[] args) {
 		new Client();
@@ -142,13 +158,18 @@ public class Client implements ActionListener, ChangeListener {
 		panel = new JPanel(new BorderLayout());
 		contPanel = new JPanel(new BorderLayout());
 		selectionBox = new JComboBox<String>(selectionListData);
+		
+		
 		selectionBox.setSelectedIndex(0);
-
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.setSize(600,400);
 		frame.setTitle("Media Player");
+
+		panel.add(consoleText);
+		
 		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		panel.add(contPanel, BorderLayout.SOUTH);
 		contPanel.add(selectionBox, BorderLayout.NORTH);		
 		selectionBox.addActionListener((ActionListener) this);
@@ -191,6 +212,9 @@ public class Client implements ActionListener, ChangeListener {
 
 			serverComm.setVideo(videoFile);
 			System.out.println("Client: Selected title : " + serverComm.getVideo().getTitle());
+			consoleText.append("Client: Selected title : " + serverComm.getVideo().getTitle() + newline);
+			consoleText.append("Loading Video: " + serverComm.getVideo().getTitle() + newline);
+			consoleText.setVisible(false);
 			try {
 				outputToServer.reset();
 				outputToServer.writeObject(serverComm);
@@ -201,6 +225,8 @@ public class Client implements ActionListener, ChangeListener {
 				mediaPlayer.stop();
 			}
 			mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
+			playButton.setVisible(false);
+			pauseButton.setVisible(true);
 		}
 		else if(e.getSource() == fullScreenButton){
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -299,12 +325,14 @@ public class Client implements ActionListener, ChangeListener {
 	private void openSocket() throws UnknownHostException, IOException {
 		serverSocket = new Socket(host, port);
 		System.out.println("Connected to: " + host + " on port: "+port);
+		consoleText.append("Connected to: " + host + " on port: " + port + newline);
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
 	}
 	
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
 		System.out.println("Client: List retrieved from Server");
+		consoleText.append("Client: List retrieved from Server" + newline);
 	}
 	
 
