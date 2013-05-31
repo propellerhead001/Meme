@@ -119,7 +119,7 @@ public class Server {
 
 	/**
 	 * push the list of videos to the client
-	 * @throws IOException an error has occured with the output stream
+	 * @throws IOException an error has occurred with the output stream
 	 */
 	private void writeListToSocket() throws IOException {
 		outputToClient.writeObject(videoList);

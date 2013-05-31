@@ -41,6 +41,12 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 
+/**
+ * The client side of the software, makes initial contact
+ * with the server on port 1139 and is then moved over to a new
+ * set of ports once it has received the list of video files
+ * @author rjm529 sc900
+ */
 public class Client implements ActionListener, ChangeListener {
 	// Connection Elements
 	private Socket serverSocket;
