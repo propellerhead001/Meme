@@ -17,6 +17,12 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
+/**
+ * This class is designed to allow clients to make an initial connection
+ * on port 1139, retrieve the video list and then be passed a second set
+ * of ports for communication and videos
+ * @author rjm529 sc900
+ */
 public class Server {
 	private List<VideoFile> videoList;
 	private XMLReader reader;
@@ -27,9 +33,12 @@ public class Server {
 	private ClientPort clientPort = new ClientPort("127.0.0.1", 1140, 1141);
 	private ArrayList <ClientObject> clients = new ArrayList(0);
 
+	/**
+	 * Creator
+	 * @param multi allows the user to specify single or multi-client server on start up
+	 * usually multi-client would be used but there may be exceptions
+	 */
 	public Server(boolean multi){
-		// multi allows the server to be started as either a single client / single server
-		//or multi-client / single server
 		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		
 		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
@@ -47,12 +56,18 @@ public class Server {
 	}
 
 
+	/**
+	 * @return returns the video list, used for test purposes
+	 */
 	public List<VideoFile> getList() { return videoList; }
 
 	public static void main(String[] args) {
 		new Server(true);
 	}
 	
+	/**
+	 * The thread allowing clients to connect to the server
+	 */
 	Thread socketThread = new Thread("Socket") {
 		public void run() {
 			try {
@@ -72,6 +87,11 @@ public class Server {
 		}
 	};
 
+	/**
+	 * opens the initial communication port
+	 * @param port the port to open
+	 * @throws IOException a problem has occured with the set up of teh socket
+	 */
 	private void openSocket(int port) throws IOException{
 		try {
 			serverSocket = new ServerSocket(port);
@@ -89,10 +109,18 @@ public class Server {
 		}
 		outputToClient = new ObjectOutputStream(clientSocket.getOutputStream());
 	}
+	/**
+	 * Push the new set of ports to the client
+	 * @throws IOException an error has occurred with the output stream 
+	 */
 	protected void writePortToSocket() throws IOException {
 		outputToClient.writeObject(clientPort);		
 	}
 
+	/**
+	 * push the list of videos to the client
+	 * @throws IOException an error has occured with the output stream
+	 */
 	private void writeListToSocket() throws IOException {
 		outputToClient.writeObject(videoList);
 	}
