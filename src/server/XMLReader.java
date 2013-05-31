@@ -13,6 +13,10 @@ enum ProcessingElement{
 	NONE, TITLE, FILENAME
 }
 
+/**
+ * Parses the XML file for Server
+ * @author sc900 rjm529
+ */
 public class XMLReader extends DefaultHandler{
 	private List<VideoFile> videoList = new ArrayList<VideoFile>();
 	private VideoFile currentVideo;
@@ -22,6 +26,10 @@ public class XMLReader extends DefaultHandler{
 	public XMLReader(){
 	}
 
+	/**
+	 * @param filename the filename of the XML file to be parsed
+	 * @return the list of VideoFiles which have been parsed
+	 */
 	public List<VideoFile> getList(String filename){
 		inputFile = filename;
 
@@ -45,7 +53,10 @@ public class XMLReader extends DefaultHandler{
 
 	}
 
-	// overridden method for start element callback
+	/* overridden method for start element callback
+	 * (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+	 */
 	public void startElement(String uri, String localName, String qName, Attributes
 			attrs) throws SAXException {
 		// sort out element name if (no) namespace in use
@@ -69,7 +80,11 @@ public class XMLReader extends DefaultHandler{
 		}
 	}
 
-	// overridden method for character data callback
+	
+	/* overridden method for character data callback
+	 * (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+	 */
 	public void characters(char ch[], int start, int length) throws SAXException {
 		//retrieves teh data stored in the title and filename elements
 		switch (currentElement){
@@ -84,8 +99,8 @@ public class XMLReader extends DefaultHandler{
 		}
 	}
 	
-	/**
-     * Called by the parser when it encounters any end element tag.
+    /* (non-Javadoc)
+     * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
      */
     public void endElement(String uri, String localName, String qName) throws SAXException {
         // sort out element name if (no) namespace in use

@@ -63,8 +63,10 @@ public class Client implements ActionListener, ChangeListener {
 	
 	// GUI Elements
 	private JFrame frame;
+	private JFrame welcFrame;
 	private JFrame videoFrame;
 	private JPanel panel;
+	private JPanel welcPanel;
 	private JPanel videoPanel;
 	private JPanel labelPanel;
 	private JPanel sliderPanel;
@@ -100,15 +102,24 @@ public class Client implements ActionListener, ChangeListener {
 	private int soundLevel = 1;
 	
 	public Client(){
+		welcFrame = new JFrame();
+		welcFrame.setVisible(true);
+		welcFrame.setSize(400, 300);
+		welcFrame.setTitle("Welcome");
+		welcPanel = new JPanel();
+		consoleText = new JTextArea();
+		welcPanel.add(consoleText);
+		welcFrame.add(welcPanel, BorderLayout.NORTH);
+		consoleText.setBounds(50,50,200,100);
+		consoleText.setVisible(true);
+		consoleText.setBackground(null);
+		consoleText.append("Loading, please wait");
+		
 		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
 		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
-		consoleText = new JTextArea();
-		consoleText.setBounds(50,50,200,100);
-		consoleText.setVisible(true);
-		consoleText.setBackground(null);
 		consoleText.append("  ----------------------------------------------------  " + newline);
 		consoleText.append("| Select a trailer to play from the menu   |" + newline);
 		consoleText.append("  ---------------------------------------------------- " + newline);
@@ -119,6 +130,7 @@ public class Client implements ActionListener, ChangeListener {
 		mediaPlayer = mediaPlayerComponent.getMediaPlayer();
 		setupGUI();
 		setupMediaPlayer();
+		welcFrame.dispose();
 	}
 	
 
@@ -555,7 +567,7 @@ public class Client implements ActionListener, ChangeListener {
 	    gammaSlider.setMaximum(Math.round(LibVlcConst.MAX_GAMMA * 100.0f));
 	    gammaSlider.setPreferredSize(new Dimension(100, 40));
 	    gammaSlider.setToolTipText("Change gamma settings ");
-	    gammaSlider.setEnabled(false);
+	    gammaSlider.setEnabled(true);
 	    
 	    brightnessSlider.setValue(Math.round(mediaPlayer.getContrast() * 100.0f));
 	    hueSlider.setValue(mediaPlayer.getHue());

@@ -39,9 +39,9 @@ public class Server {
 	 * usually multi-client would be used but there may be exceptions
 	 */
 	public Server(boolean multi){
-		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		
-		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
