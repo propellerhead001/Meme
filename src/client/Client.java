@@ -94,8 +94,8 @@ public class Client implements ActionListener, ChangeListener {
 	private int soundLevel = 1;
 	
 	public Client(){
-		String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
-		//String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
+		//String vlcLibraryPath = "C:/Program Files (x86)/VideoLAN/VLC";
+		String vlcLibraryPath = "N:/examples/java/Year2/SWEng/VLC/vlc-2.0.1";
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcLibraryPath);
 		Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		
@@ -115,25 +115,37 @@ public class Client implements ActionListener, ChangeListener {
 		setupMediaPlayer();
 	}
 	
+
+	/**
+	 * Connects the client to the server, initially on port 1139 to retrieve the
+	 * new port settings a list of videos and is then
+	 * transfered to a different set of ports defined by the server
+	 */
 	private void connectToServer() {
 		try {
+			//Initial connection
 			openSocket();
+			//retrieve video List
 			getListFromSocket();
+			//get new ports
 			getPortsFromSocket();
+			//release port 1139
 			serverSocket.close();
+			//open on new port
 			openCommSocket(serverComm.getCommPort());
 		} catch (UnknownHostException e) {
 			System.out.println("Client: Don't know about host : " + host);
-			System.exit(-1);
 		} catch (IOException e) {
 			System.out.println("Client: Couldn't open I/O connection : " + host + ":" + port);
-			System.exit(-1);
 		} catch (ClassNotFoundException e) {
 			System.out.println("Client: Class definition not found for incoming object.");
 			e.printStackTrace();
-			System.exit(-1);
 		}
 	}
+	/**
+	 * @param commPort - the port the client should communicate with the server  on
+	 * @throws IOException a connection error may occur, server not running or a network issue
+	 */
 	private void openCommSocket(int commPort) throws IOException {
 		
 		serverSocket = new Socket(host, commPort);
@@ -143,6 +155,9 @@ public class Client implements ActionListener, ChangeListener {
 		consoleText.append("Client: Ready to recieve video at " + serverComm.getAddress()+ ":" + serverComm.getVideoPort() + newline);
 		outputToServer = new ObjectOutputStream(serverSocket.getOutputStream());
 	}
+	/**
+	 * retrieves the new set of ports from the server
+	 */
 	private void getPortsFromSocket() {
 		try {
 			serverComm = (ClientPort) inputFromServer.readObject();
@@ -160,8 +175,12 @@ public class Client implements ActionListener, ChangeListener {
 		new Client();
 	}
 
+	/**
+	 * Sets up the window in which the client will play the video and from which video selection can be made
+	 */
 	public void setupGUI()
 	{
+		//set up the data for the combo box
 		String [] selectionListData = new String[videoList.size()];
 		for(int i = 0; i < videoList.size(); i++)
 		{
@@ -189,6 +208,7 @@ public class Client implements ActionListener, ChangeListener {
 		selectionBox.addActionListener((ActionListener) this);
 		frame.addWindowListener(new WindowAdapter()
 		{
+			//when the window is closed sends a signal to the server and releases all threads
 			@Override
 			public void windowClosing(WindowEvent event){
 				serverComm.setInUse(false);
@@ -329,33 +349,19 @@ public class Client implements ActionListener, ChangeListener {
 		}
 
 	}
-	private void requestVideoFromServer() {
-		try {
-			serverComm.setPlay(false);
-			outputToServer.reset();
-			outputToServer.writeObject(serverComm);
-		} catch (IOException e1) {
-			System.out.println("Client: Failed to send selection");
-			e1.printStackTrace();
-		}
-		serverComm.setPlay(true);
-		try {
-			outputToServer.writeObject(serverComm);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		if(mediaPlayer.isPlaying()){
-			mediaPlayer.stop();
-			serverComm.setPlay(false);
-		}
-		mediaPlayer.playMedia(("rtp://@127.0.0.1:"+ Integer.toString(serverComm.getVideoPort())));
-		serverComm.setPlay(true);	
-	}
-
-
+	
+	/**
+	 * This method is only used in testing
+	 * @param i the index corresponding to the object you want to retrieve
+	 * @return the VideoFile corresponding to the index given
+	 */
 	public VideoFile getList(int i) {
 		return videoList.get(i);
 	}
+	/**
+	 * @throws UnknownHostException Occurs when the host is unreachable
+	 * @throws IOException there is a problem with setting up the input stream
+	 */
 	private void openSocket() throws UnknownHostException, IOException {
 		serverSocket = new Socket(host, port);
 		System.out.println("Connected to: " + host + " on port: "+port);
@@ -363,6 +369,11 @@ public class Client implements ActionListener, ChangeListener {
 		inputFromServer = new ObjectInputStream(serverSocket.getInputStream());
 	}
 	
+	/**
+	 * Retrieves the list of videos from the input stream
+	 * @throws IOException problem with the input stream
+	 * @throws ClassNotFoundException unable to find VideoFile class
+	 */
 	private void getListFromSocket() throws IOException, ClassNotFoundException {
 		videoList = (List<VideoFile>) inputFromServer.readObject();
 		System.out.println("Client: List retrieved from Server");
@@ -370,6 +381,9 @@ public class Client implements ActionListener, ChangeListener {
 	}
 	
 
+	/**
+	 * Sets up the media player and the GUI elements associated with it
+	 */
 	protected void setupMediaPlayer(){
 		PlayerControlsPanel controlsPanel = new PlayerControlsPanel(mediaPlayer);	
 		
@@ -485,6 +499,9 @@ public class Client implements ActionListener, ChangeListener {
 		contPanel.add(controlsPanel, BorderLayout.SOUTH);
 		}
 
+	/**
+	 * Sets up a window with settings for the video player
+	 */
 	public void videoSettingsDialog(){
 
 		videoFrame  = new JFrame();
