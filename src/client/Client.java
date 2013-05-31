@@ -68,7 +68,6 @@ public class Client implements ActionListener, ChangeListener {
 	private JPanel panel;
 	private JPanel welcPanel;
 	private JPanel videoPanel;
-	private JPanel labelPanel;
 	private JPanel sliderPanel;
 	private JPanel contPanel;
 	private JSlider gammaSlider;
@@ -294,6 +293,7 @@ public class Client implements ActionListener, ChangeListener {
 		}
 		else if(e.getSource() == pauseButton){
 			serverComm.setPause(true);
+			mediaPlayer.pause();
 			playButton.setVisible(true);
 			pauseButton.setVisible(false);
 			serverComm.setPlay(false);
@@ -310,6 +310,7 @@ public class Client implements ActionListener, ChangeListener {
 
 		}
 		else if(e.getSource() == playButton){
+			mediaPlayer.play();
 			serverComm.setPlayB(true);
 			playButton.setVisible(false);
 			pauseButton.setVisible(true);
@@ -524,7 +525,6 @@ public class Client implements ActionListener, ChangeListener {
 
 		videoFrame  = new JFrame();
 		videoPanel  = new JPanel();
-		labelPanel  = new JPanel();
 		sliderPanel = new JPanel();
 		
 		videoFrame.add(videoPanel);
